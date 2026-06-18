@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rujil's — Tarjeta de Lealtad</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --rojo: #C8202A;
+    --rojo-oscuro: #9B1520;
+    --amarillo: #F5C518;
+    --negro: #111111;
+    --gris-oscuro: #1E1E1E;
+    --gris-medio: #2D2D2D;
+    --gris-claro: #F5F5F5;
+    --blanco: #FFFFFF;
+    --verde: #22C55E;
+    --texto-secundario: #888888;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--negro);
+    color: var(--blanco);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--gris-oscuro);
+    border-bottom: 3px solid var(--rojo);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 2px;
+    color: var(--blanco);
+  }
+  .logo span { color: var(--rojo); }
+  .badge-modo {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+  }
+  .badge-admin { background: var(--rojo); color: white; }
+  .badge-cliente { background: var(--amarillo); color: var(--negro); }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    background: var(--gris-oscuro);
+    padding: 0 20px;
+    border-bottom: 1px solid #333;
+  }
+  .tab {
+    padding: 14px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    color: var(--texto-secundario);
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .tab.active { color: var(--blanco); border-bottom-color: var(--rojo); }
+  .tab:hover:not(.active) { color: var(--blanco); }
+
+  /* ── MAIN CONTENT ── */
+  .main { padding: 24px 20px; max-width: 480px; margin: 0 auto; }
+
+  /* ── SECCIÓN ── */
+  .seccion { display: none; }
+  .seccion.activa { display: block; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--gris-oscuro);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    border: 1px solid #2A2A2A;
+  }
+  .card-titulo {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--texto-secundario);
+    margin-bottom: 16px;
+  }
+
+  /* ── INPUTS ── */
+  .input-group { margin-bottom: 14px; }
+  .input-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--texto-secundario);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  input, select {
+    width: 100%;
+    background: var(--gris-medio);
+    border: 1px solid #3A3A3A;
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: var(--blanco);
+    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus, select:focus { border-color: var(--rojo); }
+  input::placeholder { color: #555; }
+  select option { background: var(--gris-medio); }
+
+  /* ── BOTONES ── */
+  .btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .btn-rojo { background: var(--rojo); color: white; }
+  .btn-rojo:hover { background: var(--rojo-oscuro); }
+  .btn-amarillo { background: var(--amarillo); color: var(--negro); }
+  .btn-amarillo:hover { background: #d4a900; }
+  .btn-outline {
+    background: transparent;
+    border: 1px solid #3A3A3A;
+    color: var(--blanco);
+    margin-top: 10px;
+  }
+  .btn-outline:hover { border-color: #666; }
+  .btn-sm {
+    padding: 8px 14px;
+    font-size: 13px;
+    border-radius: 8px;
+    width: auto;
+  }
+  .btn-verde { background: var(--verde); color: white; }
+
+  /* ── RESULTADO BÚSQUEDA ── */
+  .resultado-cliente {
+    background: var(--gris-medio);
+    border-radius: 12px;
+    padding: 18px;
+    margin-top: 16px;
+    border: 1px solid #3A3A3A;
+  }
+  .cliente-nombre {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 1px;
+  }
+  .cliente-numero { font-size: 13px; color: var(--texto-secundario); margin-bottom: 12px; }
+
+  /* ── SELLOS ── */
+  .sellos-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin: 16px 0;
+  }
+  .sello {
+    aspect-ratio: 1;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    border: 2px solid #3A3A3A;
+    background: var(--gris-oscuro);
+    transition: all 0.3s;
+  }
+  .sello.activo {
+    background: var(--rojo);
+    border-color: var(--rojo);
+    box-shadow: 0 0 12px rgba(200,32,42,0.4);
+  }
+  .sello.premio {
+    background: var(--amarillo);
+    border-color: var(--amarillo);
+    animation: pulso 1s infinite;
+  }
+  @keyframes pulso {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245,197,24,0.4); }
+    50% { transform: scale(1.08); box-shadow: 0 0 0 8px rgba(245,197,24,0); }
+  }
+
+  /* ── HISTORIAL ── */
+  .historial-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #2A2A2A;
+    font-size: 13px;
+  }
+  .historial-item:last-child { border-bottom: none; }
+  .historial-platillo { font-weight: 600; }
+  .historial-fecha { color: var(--texto-secundario); font-size: 11px; }
+
+  /* ── LISTA CLIENTES ── */
+  .cliente-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid #2A2A2A;
+    cursor: pointer;
+  }
+  .cliente-item:last-child { border-bottom: none; }
+  .cliente-item:hover .ci-nombre { color: var(--amarillo); }
+  .ci-nombre { font-weight: 600; font-size: 15px; }
+  .ci-num { font-size: 12px; color: var(--texto-secundario); }
+  .ci-badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+  .ci-badge.normal { background: #2D2D2D; color: #aaa; }
+  .ci-badge.premio { background: var(--amarillo); color: var(--negro); }
+
+  /* ── PREMIO BANNER ── */
+  .premio-banner {
+    background: linear-gradient(135deg, var(--amarillo), #e6a800);
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 16px;
+    animation: aparece 0.4s ease;
+  }
+  @keyframes aparece { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; } }
+  .premio-banner .emoji { font-size: 40px; margin-bottom: 8px; }
+  .premio-banner h3 { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: var(--negro); letter-spacing: 1px; }
+  .premio-banner p { font-size: 14px; color: #444; margin-top: 4px; }
+  .premio-platillo { font-size: 18px; font-weight: 700; color: var(--negro); margin: 6px 0; }
+
+  /* ── TARJETA CLIENTE ── */
+  .tarjeta-header {
+    background: linear-gradient(135deg, var(--rojo-oscuro), var(--rojo));
+    border-radius: 20px 20px 0 0;
+    padding: 24px 20px 20px;
+    text-align: center;
+  }
+  .tarjeta-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    letter-spacing: 3px;
+    color: white;
+  }
+  .tarjeta-logo span { color: var(--amarillo); }
+  .tarjeta-subtitulo { font-size: 12px; letter-spacing: 2px; color: rgba(255,255,255,0.7); text-transform: uppercase; }
+  .tarjeta-body {
+    background: var(--gris-oscuro);
+    border-radius: 0 0 20px 20px;
+    padding: 20px;
+    border: 1px solid #2A2A2A;
+    border-top: none;
+  }
+  .tarjeta-cliente-nombre {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+  }
+  .progreso-texto {
+    font-size: 13px;
+    color: var(--texto-secundario);
+    margin-bottom: 16px;
+  }
+  .progreso-texto strong { color: var(--amarillo); }
+
+  /* ── ALERTA ── */
+  .alerta {
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 14px;
+    display: none;
+  }
+  .alerta.show { display: block; }
+  .alerta-ok { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); color: #4ade80; }
+  .alerta-err { background: rgba(200,32,42,0.15); border: 1px solid rgba(200,32,42,0.3); color: #f87171; }
+  .alerta-info { background: rgba(245,197,24,0.12); border: 1px solid rgba(245,197,24,0.25); color: var(--amarillo); }
+
+  /* ── VACÍO ── */
+  .vacio {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--texto-secundario);
+  }
+  .vacio-emoji { font-size: 40px; margin-bottom: 12px; }
+  .vacio p { font-size: 14px; }
+
+  /* ── DIVIDER ── */
+  .divider { height: 1px; background: #2A2A2A; margin: 18px 0; }
+
+  /* ── ESTADÍSTICAS ── */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .stat-card {
+    background: var(--gris-medio);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    border: 1px solid #3A3A3A;
+  }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: var(--amarillo);
+    line-height: 1;
+  }
+  .stat-label { font-size: 11px; color: var(--texto-secundario); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .hidden { display: none !important; }
+
+  /* ── PLATILLO MÁS PEDIDO TAG ── */
+  .favorito-tag {
+    display: inline-block;
+    background: rgba(245,197,24,0.15);
+    border: 1px solid rgba(245,197,24,0.3);
+    color: var(--amarillo);
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  /* ── LINK COMPARTIR ── */
+  .link-box {
+    background: var(--gris-medio);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 12px;
+    color: var(--texto-secundario);
+    word-break: break-all;
+    margin: 10px 0;
+    border: 1px dashed #3A3A3A;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">Rujil<span>'s</span></div>
+  <span class="badge-modo badge-admin" id="badge-modo">Admin</span>
+</div>
+
+<!-- TABS solo visibles en admin -->
+<div class="tabs" id="tabs-admin">
+  <div class="tab active" onclick="cambiarTab('registrar')">Registrar Compra</div>
+  <div class="tab" onclick="cambiarTab('clientes')">Mis Clientes</div>
+  <div class="tab" onclick="cambiarTab('nuevo')">Nuevo Cliente</div>
+</div>
+
+<div class="main">
+
+  <!-- ══════════════════════════════════════
+       VISTA CLIENTE (se activa por URL #cliente=NUMERO)
+  ══════════════════════════════════════ -->
+  <div class="seccion" id="sec-cliente-vista">
+    <div id="tarjeta-cliente-contenido"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       TAB: REGISTRAR COMPRA
+  ══════════════════════════════════════ -->
+  <div class="seccion activa" id="sec-registrar">
+    <div class="card">
+      <div class="card-titulo">Buscar Cliente</div>
+      <div class="input-group">
+        <label>Número de WhatsApp</label>
+        <input type="tel" id="buscar-numero" placeholder="ej. 9991234567" oninput="buscarCliente()" maxlength="15">
+      </div>
+    </div>
+
+    <div id="resultado-registro"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       TAB: MIS CLIENTES
+  ══════════════════════════════════════ -->
+  <div class="seccion" id="sec-clientes">
+    <div class="stats-grid" id="stats-grid" style="margin-bottom:16px;"></div>
+    <div class="card">
+      <div class="card-titulo">Todos los Clientes</div>
+      <div id="lista-clientes"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       TAB: NUEVO CLIENTE
+  ══════════════════════════════════════ -->
+  <div class="seccion" id="sec-nuevo">
+    <div class="card">
+      <div class="card-titulo">Registrar Nuevo Cliente</div>
+      <div id="alerta-nuevo" class="alerta"></div>
+      <div class="input-group">
+        <label>Nombre</label>
+        <input type="text" id="nuevo-nombre" placeholder="Nombre del cliente">
+      </div>
+      <div class="input-group">
+        <label>Número de WhatsApp</label>
+        <input type="tel" id="nuevo-numero" placeholder="ej. 9991234567" maxlength="15">
+      </div>
+      <button class="btn btn-rojo" onclick="registrarCliente()">Registrar Cliente</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+// DATOS
+// ══════════════════════════════════════════════════
+const PLATILLOS = [
+  "🍔 Hamburguesa",
+  "🍝 Pasta",
+  "🍗 Alitas",
+  "🍖 Boneless",
+  "🧀 Dedos de Queso",
+  "🥗 Ensalada"
+];
+
+const META = 5; // compras para premio
+
+function cargarDatos() {
+  try { return JSON.parse(localStorage.getItem('rujils_clientes') || '{}'); }
+  catch(e) { return {}; }
+}
+
+function guardarDatos(datos) {
+  localStorage.setItem('rujils_clientes', JSON.stringify(datos));
+}
+
+// ══════════════════════════════════════════════════
+// DETECTAR MODO: cliente o admin
+// ══════════════════════════════════════════════════
+function detectarModo() {
+  const hash = window.location.hash; // #cliente=9991234567
+  if (hash.startsWith('#cliente=')) {
+    const numero = hash.replace('#cliente=', '').trim();
+    mostrarVistaCliente(numero);
+  }
+}
+
+// ══════════════════════════════════════════════════
+// VISTA CLIENTE
+// ══════════════════════════════════════════════════
+function mostrarVistaCliente(numero) {
+  // Ocultar tabs admin, mostrar vista cliente
+  document.getElementById('tabs-admin').classList.add('hidden');
+  document.getElementById('badge-modo').textContent = 'Mi Tarjeta';
+  document.getElementById('badge-modo').classList.remove('badge-admin');
+  document.getElementById('badge-modo').classList.add('badge-cliente');
+
+  // Ocultar secciones admin
+  document.querySelectorAll('.seccion').forEach(s => s.classList.remove('activa'));
+  document.getElementById('sec-cliente-vista').classList.add('activa');
+
+  const datos = cargarDatos();
+  const cliente = datos[numero];
+  const contenido = document.getElementById('tarjeta-cliente-contenido');
+
+  if (!cliente) {
+    contenido.innerHTML = `
+      <div class="vacio">
+        <div class="vacio-emoji">🤔</div>
+        <p>No encontramos tu tarjeta.<br>Pídele a Rujil's que te registre.</p>
+      </div>`;
+    return;
+  }
+
+  const sellos = cliente.compras ? cliente.compras.length : 0;
+  const tienePremio = sellos >= META;
+  const platilloFav = obtenerFavorito(cliente.compras || []);
+
+  let sellosHTML = '';
+  for (let i = 0; i < META; i++) {
+    if (tienePremio) {
+      sellosHTML += `<div class="sello premio">🏆</div>`;
+    } else if (i < sellos) {
+      sellosHTML += `<div class="sello activo">🍔</div>`;
+    } else {
+      sellosHTML += `<div class="sello">·</div>`;
+    }
+  }
+
+  let historialHTML = '';
+  const historial = (cliente.compras || []).slice(-5).reverse();
+  historial.forEach(c => {
+    historialHTML += `
+      <div class="historial-item">
+        <span class="historial-platillo">${c.platillo}</span>
+        <span class="historial-fecha">${formatearFecha(c.fecha)}</span>
+      </div>`;
+  });
+
+  const premioBanner = tienePremio ? `
+    <div class="premio-banner">
+      <div class="emoji">🎉</div>
+      <h3>¡Premio Listo!</h3>
+      <div class="premio-platillo">${platilloFav || 'Tu platillo favorito'}</div>
+      <p>Muéstrale esto a Rujil's para canjearlo</p>
+    </div>` : '';
+
+  contenido.innerHTML = `
+    ${premioBanner}
+    <div class="tarjeta-header">
+      <div class="tarjeta-logo">Rujil<span>'s</span></div>
+      <div class="tarjeta-subtitulo">Tarjeta de Lealtad</div>
+    </div>
+    <div class="tarjeta-body">
+      <div class="tarjeta-cliente-nombre">${cliente.nombre}</div>
+      <div class="progreso-texto">
+        ${tienePremio
+          ? `<strong>¡Completaste tus ${META} visitas! 🎉</strong>`
+          : `<strong>${META - sellos} ${META - sellos === 1 ? 'visita' : 'visitas'}</strong> para tu premio`}
+      </div>
+
+      <div class="sellos-grid">${sellosHTML}</div>
+
+      ${platilloFav ? `
+        <div style="font-size:13px; color:var(--texto-secundario); margin-bottom:16px;">
+          Tu favorito: <strong style="color:var(--amarillo)">${platilloFav}</strong>
+        </div>` : ''}
+
+      ${historial.length ? `
+        <div class="divider"></div>
+        <div class="card-titulo" style="margin-bottom:12px;">Últimas Visitas</div>
+        ${historialHTML}` : ''}
+    </div>`;
+}
+
+// ══════════════════════════════════════════════════
+// TABS ADMIN
+// ══════════════════════════════════════════════════
+function cambiarTab(tab) {
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    const tabs = ['registrar', 'clientes', 'nuevo'];
+    t.classList.toggle('active', tabs[i] === tab);
+  });
+  document.querySelectorAll('.seccion').forEach(s => s.classList.remove('activa'));
+  document.getElementById('sec-' + tab).classList.add('activa');
+
+  if (tab === 'clientes') renderListaClientes();
+  if (tab === 'registrar') {
+    document.getElementById('buscar-numero').value = '';
+    document.getElementById('resultado-registro').innerHTML = '';
+  }
+}
+
+// ══════════════════════════════════════════════════
+// BUSCAR CLIENTE (ADMIN)
+// ══════════════════════════════════════════════════
+function buscarCliente() {
+  const numero = document.getElementById('buscar-numero').value.trim();
+  const contenedor = document.getElementById('resultado-registro');
+  if (numero.length < 8) { contenedor.innerHTML = ''; return; }
+
+  const datos = cargarDatos();
+  const cliente = datos[numero];
+
+  if (!cliente) {
+    contenedor.innerHTML = `
+      <div class="alerta alerta-err show">
+        No encontramos ese número. ¿Es cliente nuevo? Ve a "Nuevo Cliente".
+      </div>`;
+    return;
+  }
+
+  renderRegistroCliente(cliente, numero, contenedor);
+}
+
+function renderRegistroCliente(cliente, numero, contenedor) {
+  const sellos = cliente.compras ? cliente.compras.length : 0;
+  const tienePremio = sellos >= META;
+  const platilloFav = obtenerFavorito(cliente.compras || []);
+
+  let sellosHTML = '';
+  for (let i = 0; i < META; i++) {
+    if (tienePremio) {
+      sellosHTML += `<div class="sello premio">🏆</div>`;
+    } else if (i < sellos) {
+      sellosHTML += `<div class="sello activo">🍔</div>`;
+    } else {
+      sellosHTML += `<div class="sello">·</div>`;
+    }
+  }
+
+  let historialHTML = '';
+  const historial = (cliente.compras || []).slice(-5).reverse();
+  historial.forEach(c => {
+    const esFav = c.platillo === platilloFav;
+    historialHTML += `
+      <div class="historial-item">
+        <span class="historial-platillo">${c.platillo}${esFav ? '<span class="favorito-tag">⭐ Fav</span>' : ''}</span>
+        <span class="historial-fecha">${formatearFecha(c.fecha)}</span>
+      </div>`;
+  });
+
+  const linkCliente = `${window.location.origin}${window.location.pathname}#cliente=${numero}`;
+
+  const premioBanner = tienePremio ? `
+    <div class="premio-banner">
+      <div class="emoji">🏆</div>
+      <h3>¡Premio Disponible!</h3>
+      <div class="premio-platillo">${platilloFav || 'Su platillo favorito'}</div>
+      <p>Entrega el platillo y haz clic en "Canjear Premio"</p>
+    </div>` : '';
+
+  contenedor.innerHTML = `
+    ${premioBanner}
+    <div class="resultado-cliente">
+      <div class="cliente-nombre">${cliente.nombre}</div>
+      <div class="cliente-numero">📱 ${numero}</div>
+
+      <div class="sellos-grid">${sellosHTML}</div>
+
+      <div style="font-size:13px; color:var(--texto-secundario); margin-bottom:${tienePremio ? 16 : 4}px;">
+        ${tienePremio
+          ? `<strong style="color:var(--amarillo)">¡${META}/${META} visitas completadas! 🎉</strong>`
+          : `${sellos} de ${META} visitas`}
+        ${platilloFav ? ` · Favorito: <strong style="color:var(--amarillo)">${platilloFav}</strong>` : ''}
+      </div>
+
+      ${!tienePremio ? `
+        <div class="input-group">
+          <label>Platillo de esta visita</label>
+          <select id="platillo-select">
+            <option value="">— Selecciona —</option>
+            ${PLATILLOS.map(p => `<option value="${p}">${p}</option>`).join('')}
+          </select>
+        </div>
+        <button class="btn btn-rojo" onclick="agregarCompra('${numero}')">✅ Agregar Visita</button>
+      ` : `
+        <button class="btn btn-amarillo" onclick="canjearPremio('${numero}')">🎁 Canjear Premio</button>
+      `}
+
+      <div class="divider"></div>
+      <div class="card-titulo" style="margin-bottom:8px;">Compartir Tarjeta</div>
+      <div class="link-box">${linkCliente}</div>
+      <button class="btn btn-outline btn-sm" onclick="copiarLink('${linkCliente}')">📋 Copiar Link</button>
+
+      ${historial.length ? `
+        <div class="divider"></div>
+        <div class="card-titulo" style="margin-bottom:12px;">Últimas Visitas</div>
+        ${historialHTML}` : ''}
+    </div>`;
+}
+
+// ══════════════════════════════════════════════════
+// AGREGAR COMPRA
+// ══════════════════════════════════════════════════
+function agregarCompra(numero) {
+  const platillo = document.getElementById('platillo-select').value;
+  if (!platillo) { alert('Selecciona el platillo'); return; }
+
+  const datos = cargarDatos();
+  if (!datos[numero].compras) datos[numero].compras = [];
+  datos[numero].compras.push({ platillo, fecha: new Date().toISOString() });
+  guardarDatos(datos);
+
+  const contenedor = document.getElementById('resultado-registro');
+  renderRegistroCliente(datos[numero], numero, contenedor);
+}
+
+// ══════════════════════════════════════════════════
+// CANJEAR PREMIO
+// ══════════════════════════════════════════════════
+function canjearPremio(numero) {
+  const datos = cargarDatos();
+  const cliente = datos[numero];
+  const platilloFav = obtenerFavorito(cliente.compras || []);
+
+  if (!confirm(`¿Entregar premio a ${cliente.nombre}?\nPlatillo: ${platilloFav || 'su favorito'}`)) return;
+
+  datos[numero].compras = [];
+  datos[numero].premiosGanados = (datos[numero].premiosGanados || 0) + 1;
+  guardarDatos(datos);
+
+  const contenedor = document.getElementById('resultado-registro');
+  renderRegistroCliente(datos[numero], numero, contenedor);
+  const banner = document.createElement('div');
+  banner.className = 'alerta alerta-ok show';
+  banner.textContent = `🎉 Premio canjeado. Tarjeta reiniciada para ${cliente.nombre}.`;
+  contenedor.prepend(banner);
+  setTimeout(() => banner.remove(), 4000);
+}
+
+// ══════════════════════════════════════════════════
+// REGISTRAR CLIENTE NUEVO
+// ══════════════════════════════════════════════════
+function registrarCliente() {
+  const nombre = document.getElementById('nuevo-nombre').value.trim();
+  const numero = document.getElementById('nuevo-numero').value.trim();
+  const alerta = document.getElementById('alerta-nuevo');
+
+  if (!nombre || !numero) {
+    mostrarAlerta(alerta, 'alerta-err', 'Completa nombre y número.');
+    return;
+  }
+  if (numero.length < 8) {
+    mostrarAlerta(alerta, 'alerta-err', 'El número parece muy corto.');
+    return;
+  }
+
+  const datos = cargarDatos();
+  if (datos[numero]) {
+    mostrarAlerta(alerta, 'alerta-err', 'Ese número ya está registrado.');
+    return;
+  }
+
+  datos[numero] = { nombre, compras: [], premiosGanados: 0 };
+  guardarDatos(datos);
+
+  mostrarAlerta(alerta, 'alerta-ok', `✅ ${nombre} registrado. Ya puede acumular visitas.`);
+  document.getElementById('nuevo-nombre').value = '';
+  document.getElementById('nuevo-numero').value = '';
+}
+
+// ══════════════════════════════════════════════════
+// LISTA CLIENTES
+// ══════════════════════════════════════════════════
+function renderListaClientes() {
+  const datos = cargarDatos();
+  const nums = Object.keys(datos);
+  const lista = document.getElementById('lista-clientes');
+  const statsGrid = document.getElementById('stats-grid');
+
+  const totalCompras = nums.reduce((s, n) => s + (datos[n].compras?.length || 0), 0);
+  const conPremio = nums.filter(n => (datos[n].compras?.length || 0) >= META).length;
+  const totalPremios = nums.reduce((s, n) => s + (datos[n].premiosGanados || 0), 0);
+
+  statsGrid.innerHTML = `
+    <div class="stat-card"><div class="stat-num">${nums.length}</div><div class="stat-label">Clientes</div></div>
+    <div class="stat-card"><div class="stat-num">${totalCompras}</div><div class="stat-label">Visitas Totales</div></div>
+    <div class="stat-card"><div class="stat-num">${conPremio}</div><div class="stat-label">Con Premio Listo</div></div>
+    <div class="stat-card"><div class="stat-num">${totalPremios}</div><div class="stat-label">Premios Canjeados</div></div>
+  `;
+
+  if (!nums.length) {
+    lista.innerHTML = `<div class="vacio"><div class="vacio-emoji">👥</div><p>Aún no hay clientes registrados.</p></div>`;
+    return;
+  }
+
+  // Ordenar: primero con premio
+  nums.sort((a, b) => {
+    const pa = (datos[a].compras?.length || 0) >= META ? 1 : 0;
+    const pb = (datos[b].compras?.length || 0) >= META ? 1 : 0;
+    return pb - pa || (datos[b].compras?.length || 0) - (datos[a].compras?.length || 0);
+  });
+
+  lista.innerHTML = nums.map(n => {
+    const c = datos[n];
+    const sellos = c.compras?.length || 0;
+    const tienePremio = sellos >= META;
+    return `
+      <div class="cliente-item" onclick="irARegistrar('${n}')">
+        <div>
+          <div class="ci-nombre">${c.nombre}</div>
+          <div class="ci-num">📱 ${n} · ${c.premiosGanados || 0} premio${(c.premiosGanados || 0) !== 1 ? 's' : ''} ganado${(c.premiosGanados || 0) !== 1 ? 's' : ''}</div>
+        </div>
+        <span class="ci-badge ${tienePremio ? 'premio' : 'normal'}">
+          ${tienePremio ? '🏆 Premio' : `${sellos}/${META}`}
+        </span>
+      </div>`;
+  }).join('');
+}
+
+function irARegistrar(numero) {
+  cambiarTab('registrar');
+  document.getElementById('buscar-numero').value = numero;
+  buscarCliente();
+}
+
+// ══════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════
+function obtenerFavorito(compras) {
+  if (!compras.length) return null;
+  const conteo = {};
+  compras.forEach(c => { conteo[c.platillo] = (conteo[c.platillo] || 0) + 1; });
+  return Object.entries(conteo).sort((a, b) => b[1] - a[1])[0][0];
+}
+
+function formatearFecha(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function mostrarAlerta(el, clase, msg) {
+  el.className = `alerta ${clase} show`;
+  el.textContent = msg;
+  setTimeout(() => { el.className = 'alerta'; }, 4000);
+}
+
+function copiarLink(link) {
+  navigator.clipboard.writeText(link).then(() => {
+    alert('✅ Link copiado al portapapeles');
+  }).catch(() => {
+    prompt('Copia este link:', link);
+  });
+}
+
+// ══════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════
+detectarModo();
+</script>
+</body>
+</html>
